@@ -1,0 +1,276 @@
+rm(list=ls())
+
+#GRAFICAR BOX PLOT POR ANCESTRIA Y TENIENDO EN CUENTA TODOS LOS TAMAÑOS.SE DIVIDE TENER O NO TENER EL FRAGEMTNO: S,M Y L. 
+
+                                                  #BASE DE DATOS FRAGMENTO S#
+library(readxl)
+Dataset_S <- read_excel("Dataset_S.xlsx")
+View(Dataset_S)
+
+#CONVERTIR A NUMERICO TODAS LAS VARIABLES
+df_S <- as.data.frame(Dataset_S)
+df_S$NAT <- as.numeric(df_S$NAT)
+df_S$EUR <- as.numeric(df_S$EUR)
+df_S$AFR <- as.numeric(df_S$AFR)
+
+
+#comprobar igualdad de varianzas
+library(car)
+leveneTest(AFR ~ as.factor(pVNTR), data = df_S) #pvalor> 0.05- T.Student
+leveneTest(EUR ~ as.factor(pVNTR), data = df_S) #pvalor> 0.05- T.Student
+leveneTest(NAT ~ as.factor(pVNTR), data = df_S) #pvalor> 0.05- T.Student
+
+
+library(ggplot2)
+library(ggpubr)
+library(ggsignif)
+
+#TAMAÑO S DE AFRICANOS
+AFR_S <- ggplot(df_S, aes(x = as.factor(pVNTR), y = AFR, fill = as.factor(pVNTR))) +
+  geom_violin(alpha = 0.7) +
+  geom_jitter(position = position_jitter(seed = 1, width = 0.2)) +
+  geom_boxplot(width = 0.2, alpha = 0.3) +
+  geom_signif(comparisons = list(c("0", "1")),  # 🔹 Usar los valores originales
+              map_signif_level = TRUE, 
+              y_position = max(df_S$AFR, na.rm = TRUE) + 0.01, 
+              textsize = 3) +  # Ajusta la altura si es necesario
+  labs(title = "Distribution of pVNTR by ancestry",
+       x = "CYP2C9 pVNTR-S",
+       y = "% ancestry AFR") +
+  theme_minimal() +
+  expand_limits(y = max(df_S$AFR, na.rm = TRUE) + 0.1) +
+  theme(legend.position = "none", 
+        plot.title = element_text(size = 10), 
+        axis.title.x = element_text(size = 8),
+        axis.title.y = element_text(size = 10)) +
+  scale_x_discrete(labels = c("0" = "No pVNTR-S", "1" = "Yes pVNTR-S")) +  # Renombrar categorías en eje X
+  scale_fill_manual(values = c("0" = "#76EEC6", "1" = "#EE6363"), 
+                    labels = c("0" = "No pVNTR-S", "1" = "Yes pVNTR-S"))  # Renombrar en leyenda
+
+AFR_S
+t_AFR_S <- t.test(AFR ~ pVNTR, data = df_S, var.equal = TRUE)
+t_AFR_S
+#TAMAÑO S DE EUROPEOS
+EUR_S <- ggplot(df_S, aes(x = as.factor(pVNTR), y = EUR, fill = as.factor(pVNTR))) +
+  geom_violin(alpha = 0.7) +
+  geom_jitter(position = position_jitter(seed = 1, width = 0.2)) +
+  geom_boxplot(width = 0.2, alpha = 0.3) +
+  geom_signif(comparisons = list(c("0", "1")),  # 🔹 Usar los valores originales
+              map_signif_level = TRUE, 
+              y_position = max(df_S$EUR, na.rm = TRUE) + 0.001, 
+              textsize = 2) +  # Ajusta la altura si es necesario
+  labs(x = "CYP2C9 pVNTR-S",
+       y = "% ancestry EUR") +
+  theme_minimal() +
+  expand_limits(y = max(df_S$EUR, na.rm = TRUE) + 0.1) +
+  theme(legend.position = "none", 
+        axis.title.x = element_text(size = 8),
+        axis.title.y = element_text(size = 10)) +
+  scale_x_discrete(labels = c("0" = "No pVNTR-S", "1" = "Yes pVNTR-S")) +  # Renombrar categorías en eje X
+  scale_fill_manual(values = c("0" = "#76EEC6", "1" = "#EE6363"), 
+                    labels = c("0" = "No pVNTR-S", "1" = "Yes pVNTR-S"))  # Renombrar en leyenda
+EUR_S
+
+t_EUR_S <- t.test(EUR ~ pVNTR, data = df_S, var.equal = TRUE)
+t_EUR_S
+#TAMAÑO S DE NAT
+NAT_S <- ggplot(df_S, aes(x = as.factor(pVNTR), y = NAT, fill = as.factor(pVNTR))) +
+  geom_violin(alpha = 0.7) +
+  geom_jitter(position = position_jitter(seed = 1, width = 0.2)) +
+  geom_boxplot(width = 0.2, alpha = 0.3) +
+  geom_signif(comparisons = list(c("0", "1")),  # 🔹 Usar los valores originales
+              map_signif_level = TRUE, 
+              y_position = max(df_S$NAT, na.rm = TRUE) + 0.001, 
+              textsize = 2) +  # Ajusta la altura si es necesario
+  labs(x = "CYP2C9 pVNTR-S",
+       y = "% ancestry NAT") +
+  theme_minimal() +
+  expand_limits(y = max(df_S$NAT, na.rm = TRUE) + 0.005) +
+  theme(legend.position = "none", 
+        axis.title.x = element_text(size = 8),
+        axis.title.y = element_text(size = 10)) +
+  scale_x_discrete(labels = c("0" = "No pVNTR-S", "1" = "Yes pVNTR-S")) +  # Renombrar categorías en eje X
+  scale_fill_manual(values = c("0" = "#76EEC6", "1" = "#EE6363"), 
+                    labels = c("0" = "No pVNTR-S", "1" = "Yes pVNTR-S"))  # Renombrar en leyenda
+NAT_S
+
+t_NAT_S <- t.test(NAT ~ pVNTR, data = df_S, var.equal = TRUE)
+t_NAT_S
+
+         #####################################BASE DE DATOS FRAGMENTO M #####################################
+library(readxl)
+Dataset_M <- read_excel("Dataset_M.xlsx")
+View(Dataset_M)
+
+df_M <- as.data.frame(Dataset_M)
+df_M$NAT <- as.numeric(df_M$NAT)
+df_M$EUR <- as.numeric(df_M$EUR)
+df_M$AFR <- as.numeric(df_M$AFR)
+
+
+leveneTest(AFR ~ as.factor(pVNTR), data = df_M) #pvalor> 0.05- T.Student
+leveneTest(EUR ~ as.factor(pVNTR), data = df_M) #pvalor> 0.05- T.Student
+leveneTest(NAT ~ as.factor(pVNTR), data = df_M) #pvalor> 0.05- T.Student
+
+#TAMAÑO M DE AFRICANOS
+AFR_M <- ggplot(df_M, aes(x = as.factor(pVNTR), y = AFR, fill = as.factor(pVNTR))) +
+  geom_violin(alpha = 0.7) +
+  geom_jitter(position = position_jitter(seed = 1, width = 0.2)) +
+  geom_boxplot(width = 0.2, alpha = 0.3) +
+  geom_signif(comparisons = list(c("0", "1")),  # 🔹 Usar los valores originales
+              map_signif_level = TRUE, 
+              y_position = max(df_M$AFR, na.rm = TRUE) + 0.01, 
+              textsize = 3) +  # Ajusta la altura si es necesario
+  labs(x = "CYP2C9 pVNTR-M",
+       y = "% ancestry AFR") +
+  theme_minimal() +
+  expand_limits(y = max(df_M$AFR, na.rm = TRUE) + 0.1) +
+  theme(legend.position = "none", 
+        axis.title.x = element_text(size = 8),
+        axis.title.y = element_text(size = 10)) +
+  scale_x_discrete(labels = c("0" = "No pVNTR-M", "1" = "Yes pVNTR-M")) +  # Renombrar categorías en eje X
+  scale_fill_manual(values = c("0" = "#76EEC6", "1" = "#EE6363"), 
+                    labels = c("0" = "No pVNTR-M", "1" = "Yes pVNTR-M"))  # Renombrar en leyenda
+
+AFR_M
+
+t_AFR_M <- t.test(AFR ~ pVNTR, data = df_M, var.equal = TRUE)
+t_AFR_M
+#TAMAÑO M DE EUROPEOS
+EUR_M <- ggplot(df_M, aes(x = as.factor(pVNTR), y = EUR, fill = as.factor(pVNTR))) +
+  geom_violin(alpha = 0.7) +
+  geom_jitter(position = position_jitter(seed = 1, width = 0.2)) +
+  geom_boxplot(width = 0.2, alpha = 0.3) +
+  geom_signif(comparisons = list(c("0", "1")),  # 🔹 Usar los valores originales
+              map_signif_level = TRUE, 
+              y_position = max(df_M$EUR, na.rm = TRUE) + 0.01, 
+              textsize = 3) +  # Ajusta la altura si es necesario
+  labs(x = "CYP2C9 pVNTR-M",
+       y = "% ancestry EUR") +
+  theme_minimal() +
+  expand_limits(y = max(df_M$EUR, na.rm = TRUE) + 0.1) +
+  theme(legend.position = "none", 
+        axis.title.x = element_text(size = 8),
+        axis.title.y = element_text(size = 10)) +
+  scale_x_discrete(labels = c("0" = "No pVNTR-M", "1" = "Yes pVNTR-M")) +  # Renombrar categorías en eje X
+  scale_fill_manual(values = c("0" = "#76EEC6", "1" = "#EE6363"), 
+                    labels = c("0" = "No pVNTR-M", "1" = "Yes pVNTR-M"))  # Renombrar en leyenda
+EUR_M
+
+t_EUR_M <- t.test(EUR ~ pVNTR, data = df_M, var.equal = TRUE)
+t_EUR_M
+#TAMAÑO M DE NAT
+NAT_M <- ggplot(df_M, aes(x = as.factor(pVNTR), y = NAT, fill = as.factor(pVNTR))) +
+  geom_violin(alpha = 0.7) +
+  geom_jitter(position = position_jitter(seed = 1, width = 0.2)) +
+  geom_boxplot(width = 0.2, alpha = 0.3) +
+  geom_signif(comparisons = list(c("0", "1")),  # 🔹 Usar los valores originales
+              map_signif_level = TRUE, 
+              y_position = max(df_M$NAT, na.rm = TRUE) + 0.01, 
+              textsize = 2) +  # Ajusta la altura si es necesario
+  labs(x = "CYP2C9 pVNTR-M",
+       y = "% ancestry NAT") +
+  theme_minimal() +
+  expand_limits(y = max(df_M$NAT, na.rm = TRUE) + 0.005) +
+  theme(legend.position = "none", 
+        axis.title.x = element_text(size = 8),
+        axis.title.y = element_text(size = 10)) +
+  scale_x_discrete(labels = c("0" = "No pVNTR-M", "1" = "Yes pVNTR-M")) +  # Renombrar categorías en eje X
+  scale_fill_manual(values = c("0" = "#76EEC6", "1" = "#EE6363"), 
+                    labels = c("0" = "No pVNTR-M", "1" = "Yes pVNTR-M"))  # Renombrar en leyenda
+NAT_M
+
+t_NAT_M <- t.test(NAT ~ pVNTR, data = df_M, var.equal = TRUE)
+t_NAT_M
+
+ ####################################### BASE DE DATOS FRAGMENTO L #######################
+library(readxl)
+Dataset_L <- read_excel("Dataset_L.xlsx")
+View(Dataset_L)
+df_L <- as.data.frame(Dataset_L)
+df_L$NAT <- as.numeric(df_L$NAT)
+df_L$EUR <- as.numeric(df_L$EUR)
+df_L$AFR <- as.numeric(df_L$AFR)
+
+
+leveneTest(AFR ~ as.factor(pVNTR), data = df_L) #pvalor> 0.05- T.Student
+leveneTest(EUR ~ as.factor(pVNTR), data = df_L) #pvalor> 0.05- T.Student
+leveneTest(NAT ~ as.factor(pVNTR), data = df_L) #pvalor> 0.05- T.Student
+
+#TAMAÑO L DE AFRICANOS
+AFR_L <- ggplot(df_L, aes(x = as.factor(pVNTR), y = AFR, fill = as.factor(pVNTR))) +
+  geom_violin(alpha = 0.7) +
+  geom_jitter(position = position_jitter(seed = 1, width = 0.2)) +
+  geom_boxplot(width = 0.2, alpha = 0.3) +
+  geom_signif(comparisons = list(c("0", "1")),  # 🔹 Usar los valores originales
+              map_signif_level = TRUE, 
+              y_position = max(df_L$AFR, na.rm = TRUE) + 0.01, 
+              textsize = 2) +  # Ajusta la altura si es necesario
+  labs(x = "CYP2C9 pVNTR-L",
+       y = "% ancestry AFR") +
+  theme_minimal() +
+  expand_limits(y = max(df_L$AFR, na.rm = TRUE) + 0.01) +
+  theme(legend.position = "none", 
+        axis.title.x = element_text(size = 8),
+        axis.title.y = element_text(size = 10)) +
+  scale_x_discrete(labels = c("0" = "No pVNTR-L", "1" = "Yes pVNTR-L")) +  # Renombrar categorías en eje X
+  scale_fill_manual(values = c("0" = "#76EEC6", "1" = "#EE6363"), 
+                    labels = c("0" = "No pVNTR-L", "1" = "Yes pVNTR-L"))  # Renombrar en leyenda
+
+AFR_L
+
+t_AFR_L <- t.test(AFR ~ pVNTR, data = df_L, var.equal = TRUE)
+t_AFR_L
+
+#TAMAÑO L DE EUROPEOS
+EUR_L <- ggplot(df_L, aes(x = as.factor(pVNTR), y = EUR, fill = as.factor(pVNTR))) +
+  geom_violin(alpha = 0.7) +
+  geom_jitter(position = position_jitter(seed = 1, width = 0.2)) +
+  geom_boxplot(width = 0.2, alpha = 0.3) +
+  geom_signif(comparisons = list(c("0", "1")),  # 🔹 Usar los valores originales
+              map_signif_level = TRUE, 
+              y_position = max(df_L$EUR, na.rm = TRUE) + 0.01, 
+              textsize = 2) +  # Ajusta la altura si es necesario
+  labs(x = "CYP2C9 pVNTR-L",
+       y = "% ancestry EUR") +
+  theme_minimal() +
+  expand_limits(y = max(df_L$EUR, na.rm = TRUE) + 0.01) +
+  theme(legend.position = "none", 
+        axis.title.x = element_text(size = 8),
+        axis.title.y = element_text(size = 10)) +
+  scale_x_discrete(labels = c("0" = "No pVNTR-L", "1" = "Yes pVNTR-L")) +  # Renombrar categorías en eje X
+  scale_fill_manual(values = c("0" = "#76EEC6", "1" = "#EE6363"), 
+                    labels = c("0" = "No pVNTR-L", "1" = "Yes pVNTR-L"))  # Renombrar en leyenda
+EUR_L
+
+t_EUR_L <- t.test(EUR ~ pVNTR, data = df_L, var.equal = TRUE)
+t_EUR_L
+#TAMAÑO L DE NAT
+NAT_L <- ggplot(df_L, aes(x = as.factor(pVNTR), y = NAT, fill = as.factor(pVNTR))) +
+  geom_violin(alpha = 0.7) +
+  geom_jitter(position = position_jitter(seed = 1, width = 0.2)) +
+  geom_boxplot(width = 0.2, alpha = 0.3) +
+  geom_signif(comparisons = list(c("0", "1")),  # 🔹 Usar los valores originales
+              map_signif_level = TRUE, 
+              y_position = max(df_L$NAT, na.rm = TRUE) + 0.01, 
+              textsize = 2) +  # Ajusta la altura si es necesario
+  labs(x = "CYP2C9 pVNTR-L",
+       y = "% ancestry NAT") +
+  theme_minimal() +
+  expand_limits(y = max(df_L$NAT, na.rm = TRUE) + 0.005) +
+  theme(legend.position = "none", 
+        axis.title.x = element_text(size = 8),
+        axis.title.y = element_text(size = 10)) +
+  scale_x_discrete(labels = c("0" = "No pVNTR-L", "1" = "Yes pVNTR-L")) +  # Renombrar categorías en eje X
+  scale_fill_manual(values = c("0" = "#76EEC6", "1" = "#EE6363"), 
+                    labels = c("0" = "No pVNTR-L", "1" = "Yes pVNTR-L"))  # Renombrar en leyenda
+NAT_L
+
+t_NAT_L <- t.test(NAT ~ pVNTR, data = df_L, var.equal = TRUE)
+t_NAT_L
+
+
+#JUNTAR TODOS LOS BOX PLOTS EN 1
+TODOS_GRAFICOS <- ggarrange(AFR_S, EUR_S, NAT_S, AFR_M, EUR_M, NAT_M, AFR_L, EUR_L, NAT_L, 
+                        ncol = 3, nrow = 3)
+TODOS_GRAFICOS
